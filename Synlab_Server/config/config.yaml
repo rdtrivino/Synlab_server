@@ -1,0 +1,20 @@
+monitoring:
+  interval: 5
+  enabled_monitors:
+    - cpu
+    - memory
+    - disk
+    - network
+
+database:
+  url: sqlite:///monitoring.db
+  backup_interval: 86400
+
+logging:
+  level: INFO
+  retention_days: 7
+
+alerts:
+  cpu_threshold: 80
+  memory_threshold: 80
+  disk_threshold: 90
