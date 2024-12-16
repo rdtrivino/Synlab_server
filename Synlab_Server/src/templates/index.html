@@ -14,7 +14,7 @@
         <nav id="sidebar">
             <div class="sidebar-header">
                 <i class="fas fa-server"></i>
-                <h3>Synlab_Server</h3>
+                <h3>Sylanb_Server</h3>
             </div>
 
             <ul class="list-unstyled components">
@@ -29,6 +29,9 @@
                 </li>
                 <li>
                     <a href="/history"><i class="fas fa-history"></i> Historial</a>
+                </li>
+                <li>
+                    <a href="#"><i class="fas fa-users"></i> Usuarios</a>
                 </li>
                 <li>
                     <a href="/settings"><i class="fas fa-cog"></i> Configuración</a>
@@ -56,7 +59,29 @@
                     </div>
                 </div>
             </nav>
-
+            <div class="container-fluid py-4">
+                <!-- Server Info -->
+                <div class="alert alert-info d-flex justify-content-between align-items-center rounded shadow-sm" style="background: #ffffff; border: 1px solid #eef1f3;">
+                    <div class="d-flex align-items-center">
+                        <i class="fas fa-server me-2 text-primary" style="font-size: 1.5rem;"></i>
+                        <span style="font-size: 1.2rem; color: #0d6efd;">
+                            Mostrando: <strong id="currentDisplay" style="color: #0056b3;">Servidor 1</strong>
+                        </span>
+                    </div>
+                    <div class="dropdown">
+                        <button class="btn btn-primary dropdown-toggle px-4 py-2 rounded-pill" type="button" id="serverDropdown" data-bs-toggle="dropdown">
+                            Servidor
+                        </button>
+                        <ul class="dropdown-menu shadow" aria-labelledby="serverDropdown">
+                            <li><a class="dropdown-item server-option" href="#" data-server="Servidor 1"><i class="fas fa-circle text-primary me-2"></i> Servidor 1</a></li>
+                            <li><a class="dropdown-item server-option" href="#" data-server="Servidor 2"><i class="fas fa-circle text-warning me-2"></i> Servidor 2</a></li>
+                            <li><a class="dropdown-item server-option" href="#" data-server="Servidor 3"><i class="fas fa-circle text-success me-2"></i> Servidor 3</a></li>
+                            <li><a class="dropdown-item server-option" href="#" data-server="Canal A"><i class="fas fa-satellite-dish text-info me-2"></i> Canal A</a></li>
+                            <li><a class="dropdown-item server-option" href="#" data-server="Canal B"><i class="fas fa-satellite-dish text-secondary me-2"></i> Canal B</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>            
             <!-- Dashboard Content -->
             <div class="dashboard-content">
                 <!-- Quick Stats -->
@@ -107,40 +132,19 @@
                     </div>
                 </div>
 
-                <!-- Server Performance and Channel Control -->
+                <!-- Charts -->
                 <div class="row mt-4">
                     <div class="col-md-8">
                         <div class="card">
                             <div class="card-header">
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <h5>Rendimiento del Sistema</h5>
-                                    <div class="server-controls">
-                                        <div class="d-flex align-items-center">
-                                            <label class="me-2">Servidor:</label>
-                                            <select class="form-select form-select-sm me-2" id="serverSelect">
-                                                <option value="server1">Servidor Principal</option>
-                                                <option value="server2">Servidor Secundario</option>
-                                                <option value="server3">Servidor Backup</option>
-                                            </select>
-                                            <span class="badge bg-success" id="serverStatus">En línea</span>
-                                        </div>
-                                    </div>
+                                <h5>Rendimiento del Sistema</h5>
+                                <div class="card-header-actions">
+                                    <button class="btn btn-sm">Hoy</button>
+                                    <button class="btn btn-sm">Semana</button>
+                                    <button class="btn btn-sm">Mes</button>
                                 </div>
                             </div>
                             <div class="card-body">
-                                <div class="server-info-panel mb-3">
-                                    <div class="row align-items-center">
-                                        <div class="col">
-                                            <h6 id="currentServer">Servidor Actual: Principal</h6>
-                                            <small id="uptime">Tiempo activo: 00:00:00</small>
-                                        </div>
-                                        <div class="col-auto">
-                                            <button class="btn btn-primary btn-sm" id="switchServer">
-                                                Cambiar Servidor
-                                            </button>
-                                        </div>
-                                    </div>
-                                </div>
                                 <canvas id="systemPerformance"></canvas>
                             </div>
                         </div>
@@ -157,7 +161,7 @@
                     </div>
                 </div>
 
-                <!-- System Info and Processes -->
+                <!-- System Info -->
                 <div class="row mt-4">
                     <div class="col-md-6">
                         <div class="card">
@@ -193,4 +197,4 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="{{ url_for('static', path='/js/main.js') }}"></script>
 </body>
-</html>
+</html> 
