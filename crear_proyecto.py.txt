@@ -1,0 +1,291 @@
+import os
+import shutil
+
+def crear_estructura_proyecto():
+    # Nombre del proyecto
+    nombre_proyecto = "monitor_servidores"
+    
+    # Estructura del proyecto
+    estructura = {
+        'app': {
+            '__init__.py': '''from flask import Flask
+from app.extensions import db, login_manager
+from app.config import Config
+
+def create_app(config_class=Config):
+    app = Flask(__name__)
+    app.config.from_object(config_class)
+
+    # Inicializar extensiones
+    db.init_app(app)
+    login_manager.init_app(app)
+
+    # Registrar blueprints
+    from app.routes import auth_bp, admin_bp, user_bp
+    app.register_blueprint(auth_bp)
+    app.register_blueprint(admin_bp)
+    app.register_blueprint(user_bp)
+
+    return app
+''',
+            'config.py': '''import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+class Config:
+    SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev'
+    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///monitores.db'
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    MAIL_SERVER = os.environ.get('MAIL_SERVER')
+    MAIL_PORT = int(os.environ.get('MAIL_PORT') or 25)
+    MAIL_USE_TLS = os.environ.get('MAIL_USE_TLS') is not None
+    MAIL_USERNAME = os.environ.get('MAIL_USERNAME')
+    MAIL_PASSWORD = os.environ.get('MAIL_PASSWORD')
+''',
+            'extensions.py': '''from flask_sqlalchemy import SQLAlchemy
+from flask_login import LoginManager
+from flask_mail import Mail
+
+db = SQLAlchemy()
+login_manager = LoginManager()
+mail = Mail()
+''',
+            'models': {
+                '__init__.py': '',
+                'usuario.py': '''from app.extensions import db
+from flask_login import UserMixin
+
+class Usuario(UserMixin, db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    username = db.Column(db.String(80), unique=True, nullable=False)
+    password = db.Column(db.String(120), nullable=False)
+    is_admin = db.Column(db.Boolean, default=False)
+''',
+                'servidor.py': '''from app.extensions import db
+import datetime
+
+class Servidor(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    nombre = db.Column(db.String(80), nullable=False)
+    ip = db.Column(db.String(15), nullable=False)
+    estado = db.Column(db.Boolean, default=True)
+    ultimo_check = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+'''
+            },
+            'routes': {
+                '__init__.py': '''from .auth import auth_bp
+from .admin import admin_bp
+from .user import user_bp
+''',
+                'auth.py': '''from flask import Blueprint, render_template, redirect, url_for, request, flash
+from flask_login import login_user, logout_user, login_required
+from app.models.usuario import Usuario
+
+auth_bp = Blueprint('auth', __name__)
+
+@auth_bp.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        # Implementar lógica de login
+        pass
+    return render_template('auth/login.html')
+''',
+                'admin.py': '''from flask import Blueprint, render_template
+from flask_login import login_required
+
+admin_bp = Blueprint('admin', __name__)
+
+@admin_bp.route('/admin')
+@login_required
+def dashboard():
+    return render_template('admin/dashboard.html')
+''',
+                'user.py': '''from flask import Blueprint, render_template
+from flask_login import login_required
+
+user_bp = Blueprint('user', __name__)
+
+@user_bp.route('/dashboard')
+@login_required
+def dashboard():
+    return render_template('user/dashboard.html')
+'''
+            },
+            'services': {
+                '__init__.py': '',
+                'monitor.py': '''import ping3
+
+def check_server_status(ip):
+    try:
+        response_time = ping3.ping(ip)
+        return response_time is not None
+    except:
+        return False
+''',
+                'email.py': '''from flask_mail import Message
+from app.extensions import mail
+
+def send_alert_email(server_name, status):
+    msg = Message(
+        f"Alerta de servidor: {server_name}",
+        recipients=['admin@example.com']
+    )
+    msg.body = f"El servidor {server_name} está {status}"
+    mail.send(msg)
+'''
+            },
+            'static': {
+                'css': {
+                    'style.css': '''/* Estilos principales */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+''',
+                    'custom.css': ''
+                },
+                'js': {
+                    'main.js': '''// Funcionalidad principal
+document.addEventListener('DOMContentLoaded', function() {
+    // Código JavaScript
+});
+''',
+                    'charts.js': ''
+                },
+                'img': {}
+            },
+            'templates': {
+                'base.html': '''<!DOCTYPE html>
+<html>
+<head>
+    <title>{% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    {% block content %}{% endblock %}
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>
+''',
+                'auth': {
+                    'login.html': '''{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+{% block content %}
+<div class="login-container">
+    <h1>Login</h1>
+    <form method="POST">
+        <input type="text" name="username" placeholder="Usuario" required>
+        <input type="password" name="password" placeholder="Contraseña" required>
+        <button type="submit">Iniciar sesión</button>
+    </form>
+</div>
+{% endblock %}
+'''
+                },
+                'admin': {
+                    'dashboard.html': '''{% extends "base.html" %}
+{% block title %}Admin Dashboard{% endblock %}
+{% block content %}
+<h1>Panel de Administración</h1>
+{% endblock %}
+'''
+                },
+                'user': {
+                    'dashboard.html': '''{% extends "base.html" %}
+{% block title %}User Dashboard{% endblock %}
+{% block content %}
+<h1>Panel de Usuario</h1>
+{% endblock %}
+'''
+                }
+            }
+        },
+        'tests': {
+            '__init__.py': '',
+            'test_auth.py': '''import unittest
+from app import create_app
+
+class TestAuth(unittest.TestCase):
+    def setUp(self):
+        self.app = create_app()
+        self.client = self.app.test_client()
+
+    def test_login_page(self):
+        response = self.client.get('/login')
+        self.assertEqual(response.status_code, 200)
+''',
+            'test_monitor.py': '''import unittest
+from app.services.monitor import check_server_status
+
+class TestMonitor(unittest.TestCase):
+    def test_server_status(self):
+        status = check_server_status('127.0.0.1')
+        self.assertIsInstance(status, bool)
+'''
+        },
+        '.env': '''SECRET_KEY=tu_clave_secreta
+DATABASE_URL=sqlite:///monitores.db
+MAIL_SERVER=smtp.gmail.com
+MAIL_PORT=587
+MAIL_USE_TLS=True
+MAIL_USERNAME=tu_email@gmail.com
+MAIL_PASSWORD=tu_contraseña
+''',
+        '.gitignore': '''venv/
+__pycache__/
+*.pyc
+.env
+instance/
+.pytest_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+''',
+        'requirements.txt': '''Flask==2.0.1
+Flask-SQLAlchemy==2.5.1
+Flask-Login==0.5.0
+Flask-Mail==0.9.1
+ping3==3.0.2
+python-dotenv==0.19.0
+''',
+        'run.py': '''from app import create_app
+
+app = create_app()
+
+if __name__ == '__main__':
+    app.run(debug=True)
+'''
+    }
+
+    def crear_archivos(base_path, estructura):
+        for nombre, contenido in estructura.items():
+            ruta = os.path.join(base_path, nombre)
+            if isinstance(contenido, dict):
+                os.makedirs(ruta, exist_ok=True)
+                crear_archivos(ruta, contenido)
+            else:
+                with open(ruta, 'w', encoding='utf-8') as f:
+                    f.write(contenido)
+
+    # Crear el directorio principal
+    if os.path.exists(nombre_proyecto):
+        shutil.rmtree(nombre_proyecto)
+    os.makedirs(nombre_proyecto)
+
+    # Crear la estructura
+    crear_archivos(nombre_proyecto, estructura)
+    
+    print(f"Estructura del proyecto '{nombre_proyecto}' creada exitosamente!")
+    print("\nPara comenzar:")
+    print(f"1. cd {nombre_proyecto}")
+    print("2. python -m venv venv")
+    print("3. source venv/bin/activate  # En Windows: venv\\Scripts\\activate")
+    print("4. pip install -r requirements.txt")
+    print("5. python run.py")
+
+if __name__ == '__main__':
+    crear_estructura_proyecto()

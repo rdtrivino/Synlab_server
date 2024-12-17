@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ADMIN - SYNLAB_SERVER</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link href="{{ url_for('static', path='/css/styles.css') }}" rel="stylesheet">
+</head>
+<body>
+    <div class="wrapper">
+        <!-- Sidebar -->
+        <nav id="sidebar">
+            <div class="sidebar-header">
+                <i class="fas fa-server"></i>
+                <h3>Sylanb_Server</h3>
+            </div>
+
+            <ul class="list-unstyled components">
+                <li class="active">
+                    <a href="#"><i class="fas fa-home"></i> Dashboard</a>
+                </li>
+                <li>
+                    <a href="/channels"><i class="fas fa-satellite-dish"></i> Canales</a>
+                </li>
+                <li>
+                    <a href="/statistics"><i class="fas fa-chart-line"></i> Estadísticas</a>
+                </li>
+                <li>
+                    <a href="/history"><i class="fas fa-history"></i> Historial</a>
+                </li>
+                <li>
+                    <a href="/settings"><i class="fas fa-cog"></i> Configuración</a>
+                </li>
+            </ul>
+        </nav>
+
+        <!-- Page Content -->
+        <div id="content">
+            <!-- Navbar -->
+            <nav class="navbar navbar-expand-lg">
+                <div class="container-fluid">
+                    <button type="button" id="sidebarCollapse" class="btn">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div class="d-flex align-items-center">
+                        <div class="datetime me-4">
+                            <i class="far fa-clock"></i>
+                            <span id="currentTime"></span>
+                        </div>
+                        <div class="profile-menu">
+                            <img src="{{ url_for('static', path='/img/avatar.png') }}" alt="Profile" class="avatar">
+                            <span>Admin</span>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+
+            <!-- Dashboard Content -->
+            <div class="dashboard-content">
+                <!-- Quick Stats -->
+                <div class="row stats-cards">
+                    <div class="col-md-3">
+                        <div class="quick-stat">
+                            <div class="icon cpu">
+                                <i class="fas fa-microchip"></i>
+                            </div>
+                            <div class="info">
+                                <h3 id="cpuUsage">-</h3>
+                                <p>CPU</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="quick-stat">
+                            <div class="icon memory">
+                                <i class="fas fa-memory"></i>
+                            </div>
+                            <div class="info">
+                                <h3 id="memoryUsage">-</h3>
+                                <p>Memoria</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="quick-stat">
+                            <div class="icon temperature">
+                                <i class="fas fa-temperature-high"></i>
+                            </div>
+                            <div class="info">
+                                <h3 id="temperatureValue">-</h3>
+                                <p>Temperatura</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-3">
+                        <div class="quick-stat">
+                            <div class="icon network">
+                                <i class="fas fa-network-wired"></i>
+                            </div>
+                            <div class="info">
+                                <h3 id="networkSpeed">-</h3>
+                                <p>Red</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="row mt-4">
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Rendimiento del Sistema</h5>
+                                <div class="card-header-actions">
+                                    <button class="btn btn-sm">Hoy</button>
+                                    <button class="btn btn-sm">Semana</button>
+                                    <button class="btn btn-sm">Mes</button>
+                                </div>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="systemPerformance"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Uso de Recursos</h5>
+                            </div>
+                            <div class="card-body">
+                                <canvas id="resourcesDonut"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- System Info -->
+                <div class="row mt-4">
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Información del Sistema</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="system-info" id="systemInfo">
+                                    <!-- System info will be populated by JS -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card">
+                            <div class="card-header">
+                                <h5>Procesos Activos</h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="table-responsive">
+                                    <table class="table table-hover" id="processTable">
+                                        <!-- Process table will be populated by JS -->
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="{{ url_for('static', path='/js/main.js') }}"></script>
+</body>
+</html> 
